@@ -7,8 +7,9 @@ import time # Librería para hacer que el programa que controla el bot no se aca
 
 import requests
 import json
+from key import *
  
-TOKEN = '126754070:AAHFg1a9ABNMC0JeRH7mpNR9XH_LorEzK1E' # Nuestro tokken del bot (el que @BotFather nos dió).
+ # Nuestro tokken del bot (el que @BotFather nos dió).
  
 bot = telebot.TeleBot(TOKEN) # Creamos el objeto de nuestro bot.
 
@@ -34,7 +35,7 @@ def listener(messages): # Con esto, estamos definiendo una función llamada 'lis
             cid = m.chat.id # Almacenaremos el ID de la conversación.
             
             if lat == 0 or lon == 0:
-                bot.send_message(cid,"Primero manda tu ubicación desde el icono de ")# + u'\U0001f4ce')
+                bot.send_message(cid,"Primero manda tu ubicación desde el icono de ")#+ u'\U0001f4ce')
             else:    
                 if m.text == disponibles:
                     obtener('valenbisi/disponibles',lat,lon,cid)
@@ -60,8 +61,30 @@ def listener(messages): # Con esto, estamos definiendo una función llamada 'lis
             lat = int(lat)
             lon = int(lon)
             
+            markup = types.ReplyKeyboardMarkup(row_width=2)
+            markup.add(libres,disponibles,parking,taxi)
+    
+            bot.send_message(cid, "¿Qué buscas?:", reply_markup=markup)
+            markup = types.ReplyKeyboardHide(selective=False)
             
+            
+def obtener(tipo,latitud,longitud,cid):
+    
+    url = 'http://mapas.valencia.es/lanzadera/gps/' + tipo + '/' + str(latitud)+ '/' + str(longitud) 
+    r = requests.get(url, auth=(user,passw ))
 
+    json_object = r.json()
+    parsed_data = json.dumps(json_object)
+
+    lol = json.loads(parsed_data)
+    for parkings in lol:
+        lati = (parkings["latDestino"])/float(10**6)
+        longi = (parkings["lonDestino"])/float(10**6)
+        distan = "Distancia: " + str((parkings["distancia"])) +" m"
+        mensa = (parkings["mensaje"])
+        stringfinal = distan +"\n"+mensa
+        bot.send_location( cid,lati,longi)
+        bot.send_message( cid, stringfinal)
  
 bot.set_update_listener(listener) # Así, le decimos al bot que utilice como función escuchadora nuestra función 'listener' declarada arriba.
  
@@ -89,25 +112,7 @@ def command_bisi(m): # Definimos una función que resuelva lo que necesitemos.
     
     
     
-def obtener(tipo,latitud,longitud,cid):
-    
-    url = 'http://mapas.valencia.es/lanzadera/gps/' + tipo + '/' + str(latitud)+ '/' + str(longitud) 
-    r = requests.get(url, auth=('jcollado', 'FSwkOrUD'))
 
-    json_object = r.json()
-    parsed_data = json.dumps(json_object)
-
-    lol = json.loads(parsed_data)
-    for parkings in lol:
-        lati = (parkings["latDestino"])/float(10**6)
-        longi = (parkings["lonDestino"])/float(10**6)
-        distan = "Distancia: " + str((parkings["distancia"])) +" m"
-        mensa = (parkings["mensaje"])
-        stringfinal = distan +"\n"+mensa
-        
-        
-        bot.send_location( cid,lati,longi)
-        bot.send_message( cid, stringfinal)
  
 while True: # Ahora le decimos al programa que no se cierre haciendo un bucle que siempre se ejecutará.
     time.sleep(300) # Hacemos que duerma durante un periodo largo de tiempo para que la CPU no esté trabajando innecesáremente.
