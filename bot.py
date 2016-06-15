@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
- 
+
+
 import telebot # Librería de la API del bot.
 from telebot import types # Tipos para la API del bot.
 import time # Librería para hacer que el programa que controla el bot no se acabe.
@@ -33,7 +34,7 @@ def listener(messages): # Con esto, estamos definiendo una función llamada 'lis
             cid = m.chat.id # Almacenaremos el ID de la conversación.
             
             if lat == 0 or lon == 0:
-                bot.send_message(cid,"Primero manda tu ubicacion desde el icono de " + u'\U0001f4ce')
+                bot.send_message(cid,"Primero manda tu ubicación desde el icono de ")# + u'\U0001f4ce')
             else:    
                 if m.text == disponibles:
                     obtener('valenbisi/disponibles',lat,lon,cid)
@@ -52,6 +53,7 @@ def listener(messages): # Con esto, estamos definiendo una función llamada 'lis
         if m.content_type == 'location':
             cid = m.chat.id 
             print "[" + str(cid) + "]: " + 'localizacion'
+            bot.send_message(cid,"Ubicación actualizada")
            
             lat = (m.location.latitude) * 10**6
             lon = (m.location.longitude) * 10**6
